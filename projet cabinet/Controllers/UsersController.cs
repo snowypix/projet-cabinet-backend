@@ -26,11 +26,15 @@ namespace projet_cabinet.Controllers
         private string GenerateJwtToken(int expirationMinutes, string username, int id)
         {
             var keyBytes = Encoding.ASCII.GetBytes("tkrpgkretrkgreltrgertgtr");
-
+            string userType = context.Users
+            .Where(u => u.ID == id)
+            .Select(u => EF.Property<string>(u, "UserType"))
+            .FirstOrDefault();
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim("Id", id.ToString())
+                new Claim("Id", id.ToString()),
+                new Claim("Type", userType)
             };
 
             var tokenOptions = new JwtSecurityToken(
@@ -47,16 +51,18 @@ namespace projet_cabinet.Controllers
         // Dependency injection of your DbContext or user service here
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] User model)
+        public IActionResult Register([FromBody] Patient model)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
-            var user = new User
+            var user = new Patient
             {
                 Email = model.Email,
                 Password = hashedPassword,
                 FullName = model.FullName,
                 Age = model.Age,
-                Genre = model.Genre
+                Genre = model.Genre,
+                Adresse = model.Adresse,
+                Antecedents = model.Antecedents
             };
             context.Users.Add(user);
             context.SaveChanges();
@@ -78,80 +84,6 @@ namespace projet_cabinet.Controllers
             }
             var token = GenerateJwtToken(10, user.Email, user.ID);
             return Ok(new { message = "Login successful" , token = token});
-        }
-        [AllowAnonymous]
-        [HttpGet("horaires")]
-        public IActionResult Horaires()
-        {
-            var horaires = context.Medecins.Select(m => new
-            {
-                HoraireDebut = m.HoraireDebut,
-                HoraireFin = m.HoraireFin,
-                FullName = m.FullName,
-                Id = m.ID
-            }).ToList();
-            return Ok(horaires);
-        }
-        [AllowAnonymous]
-        [HttpPost("rdv/create")]
-        public IActionResult rdvCreate(RDV rdv)
-        {
-            // Check for rendez-vous conflicts
-            bool isConflict = CheckRdvConflicts(rdv);
-
-            if (isConflict)
-            {
-                return BadRequest("Conflit de rendez-vous choisissez un autre.");
-            }
-            RDV newRdv = new RDV
-            {
-                Date = rdv.Date,
-                Heure = rdv.Heure,
-                MedecinID = rdv.MedecinID,
-                PatientID = rdv.PatientID
-            };
-
-            context.RDVs.Add(newRdv);
-            context.SaveChanges();
-
-            return Ok();
-        }
-        private bool CheckRdvConflicts(RDV rdv)
-        {
-            // Get the range of 15 minutes
-            TimeSpan timeRange = TimeSpan.FromMinutes(15);
-
-            // No need to parse, directly use TimeSpan
-            TimeSpan startTime = rdv.Heure - timeRange;
-            TimeSpan endTime = rdv.Heure + timeRange;
-
-            // Query the database to check for any conflicts
-            bool isConflict = context.RDVs.Any(r =>
-                r.MedecinID == rdv.MedecinID &&
-                r.Date.Date == rdv.Date.Date && // Compare only the Date part
-                r.Heure >= startTime &&
-                r.Heure <= endTime);
-
-            return isConflict;
-        }
-
-        [AllowAnonymous]
-        [HttpGet("rdv/rdvs/{id}")]
-        public IActionResult GetRDVs(int id)
-        {
-            var rdvs = context.RDVs
-                .Include(rdv => rdv.Medecin)
-                .Where(rdv => rdv.PatientID == id)
-                .Select(rdv => new
-                {
-                    rdv.RDVId,
-                    rdv.Date,
-                    rdv.Heure,
-                    MedecinName = rdv.Medecin != null ? rdv.Medecin.FullName : string.Empty
-                })
-                .ToList();
-
-            return Ok(rdvs);
         }
     }
 }
