@@ -3,10 +3,10 @@
     public class Examen
     {
         public int ExamenID { get; set; }
-        public string ExamenDate { get; set; }
+        public DateTime ExamenDate { get; set; }
         public string ExamenNom { get; set; }
         public string Resultat { get; set; }
         public int DossierID { get; set; }
-        public virtual Dossier Dossier { get; set; }
+        public virtual Dossier? Dossier { get; set; }
     }
 }
