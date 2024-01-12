@@ -22,20 +22,47 @@ namespace projet_cabinet.Controllers
         }
 
 
-        // POST: api/Examen
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public IActionResult PostExamen(Examen examen)
+        [HttpGet("{dossierId}")]
+        public IActionResult Prescriptions(int dossierId)
         {
-            if (context.Examens == null)
-            {
-                return Problem("Entity set 'UsersDBContext.Examens'  is null.");
-            }
-            context.Examens.Add(examen);
-            context.SaveChangesAsync();
-
-            return CreatedAtAction("GetExamen", new { id = examen.ExamenID }, examen);
+            var examens = context.Examens
+                .Where(p => p.DossierID == dossierId)
+                .Select(p => new
+                {
+                    p.ExamenID,
+                    p.ExamenDate,
+                    p.ExamenNom,
+                    p.Resultat
+                }).ToList();
+            return Ok(examens);
         }
+      
 
+        [HttpPost("{dossierId}")]
+        public IActionResult CreateExamen(int dossierId, [FromBody] Examen examen)
+        {
+            try
+            {
+                // Make sure the dossier exists
+                var dossier = context.Dossiers.Find(dossierId);
+                if (dossier == null)
+                {
+                    return NotFound("Dossier not found");
+                }
+
+                // Set the DossierID for the prescription
+                examen.DossierID = dossierId;
+
+                // Add the prescription to the context and save changes
+                context.Examens.Add(examen);
+                context.SaveChanges();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to create examen: {ex.Message}");
+            }
+        }
     }
 }

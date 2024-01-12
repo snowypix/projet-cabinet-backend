@@ -33,21 +33,47 @@ namespace projet_cabinet.Data
                 }).ToList();
             return Ok(prescriptions);
         }
-        [HttpPost]
-        public IActionResult AddPrescription([FromBody] Prescription model)
+        [HttpGet("patient/{patientId}")]
+        public IActionResult PrescriptionsByPatientId(int patientId)
         {
-            var nouvellePrescription = new Prescription
+            var prescriptions = context.Dossiers
+                .Where(d => d.PatientID == patientId)
+                .SelectMany(d => d.Prescriptions)
+                .Select(p => new
+                {
+                    p.PrescriptionID,
+                    p.PrescriptionDate,
+                    p.Medicaments
+                    // Add other relevant properties of Prescription here
+                }).ToList();
+
+            return Ok(prescriptions);
+        }
+        [HttpPost("{dossierId}")]
+        public IActionResult CreatePrescription(int dossierId, [FromBody] Prescription prescription)
+        {
+            try
             {
-                PrescriptionDate = model.PrescriptionDate,
-                Medicaments = model.Medicaments,
-                DossierID = model.DossierID
-                // Assurez-vous que tous les champs nécessaires sont inclus
-            };
+                // Make sure the dossier exists
+                var dossier = context.Dossiers.Find(dossierId);
+                if (dossier == null)
+                {
+                    return NotFound("Dossier not found");
+                }
 
-            context.Prescriptions.Add(nouvellePrescription);
-            context.SaveChanges();
+                // Set the DossierID for the prescription
+                prescription.DossierID = dossierId;
 
-            return Ok(nouvellePrescription);
+                // Add the prescription to the context and save changes
+                context.Prescriptions.Add(prescription);
+                context.SaveChanges();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to create prescription: {ex.Message}");
+            }
         }
     }
 }

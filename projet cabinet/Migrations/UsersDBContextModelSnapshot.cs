@@ -43,7 +43,7 @@ namespace projet_cabinet.Migrations
                     b.HasIndex("PatientID")
                         .IsUnique();
 
-                    b.ToTable("Dossiers");
+                    b.ToTable("Dossiers", (string)null);
                 });
 
             modelBuilder.Entity("projet_cabinet.Models.Examen", b =>
@@ -72,7 +72,7 @@ namespace projet_cabinet.Migrations
 
                     b.HasIndex("DossierID");
 
-                    b.ToTable("Examens");
+                    b.ToTable("Examens", (string)null);
                 });
 
             modelBuilder.Entity("projet_cabinet.Models.Prescription", b =>
@@ -97,7 +97,7 @@ namespace projet_cabinet.Migrations
 
                     b.HasIndex("DossierID");
 
-                    b.ToTable("Prescriptions");
+                    b.ToTable("Prescriptions", (string)null);
                 });
 
             modelBuilder.Entity("projet_cabinet.Models.RDV", b =>
@@ -126,7 +126,7 @@ namespace projet_cabinet.Migrations
 
                     b.HasIndex("PatientID");
 
-                    b.ToTable("RDVs");
+                    b.ToTable("RDVs", (string)null);
                 });
 
             modelBuilder.Entity("projet_cabinet.Models.User", b =>
@@ -166,7 +166,7 @@ namespace projet_cabinet.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator<string>("UserType").HasValue("User");
                 });
@@ -175,7 +175,7 @@ namespace projet_cabinet.Migrations
                 {
                     b.HasBaseType("projet_cabinet.Models.User");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator().HasValue("Infirmier");
                 });
@@ -190,7 +190,7 @@ namespace projet_cabinet.Migrations
                     b.Property<TimeSpan>("HoraireFin")
                         .HasColumnType("time");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator().HasValue("Medecin");
                 });
@@ -206,7 +206,7 @@ namespace projet_cabinet.Migrations
                     b.Property<int?>("DossierID")
                         .HasColumnType("int");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator().HasValue("Patient");
                 });

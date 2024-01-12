@@ -8,5 +8,6 @@
         public string Resultat { get; set; }
         public int DossierID { get; set; }
         public virtual Dossier? Dossier { get; set; }
+        
     }
 }

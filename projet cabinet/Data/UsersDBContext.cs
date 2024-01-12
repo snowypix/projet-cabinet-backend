@@ -26,13 +26,13 @@ namespace projet_cabinet.Data
                 .HasOne(r => r.Medecin)
                 .WithMany(m => m.RDVs)
                 .HasForeignKey(r => r.MedecinID)
-                .OnDelete(DeleteBehavior.Restrict); // To prevent cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<RDV>()
                 .HasOne(r => r.Patient)
                 .WithMany(p => p.RDVs)
                 .HasForeignKey(r => r.PatientID)
-                .OnDelete(DeleteBehavior.Cascade); // Assuming you want cascade delete here
+                .OnDelete(DeleteBehavior.Cascade); 
             modelBuilder.Entity<Prescription>()
                 .HasOne(p => p.Dossier)
                 .WithMany(d => d.Prescriptions)
