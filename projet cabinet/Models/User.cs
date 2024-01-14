@@ -25,7 +25,7 @@ namespace projet_cabinet.Models
     public class Patient : User
     {
         public int? DossierID { get; set; }
-        public string Antecedents { get; set; }
+        public string? Antecedents { get; set; }
         public virtual Dossier? Dossier { get; set; }
         public virtual ICollection<RDV>? RDVs { get; set; }
     }
@@ -41,7 +41,7 @@ namespace projet_cabinet.Models
     {
         public virtual ICollection<Dossier>? Dossiers { get; set; }
         public virtual ICollection<RDV>? RDVs { get; set; }
-        public TimeSpan HoraireDebut { get; set; }
-        public TimeSpan HoraireFin { get; set; }
+        public TimeSpan? HoraireDebut { get; set; }
+        public TimeSpan? HoraireFin { get; set; }
     }
 }
