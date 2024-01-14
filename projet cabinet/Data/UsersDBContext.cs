@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using projet_cabinet.Models;
+
 namespace projet_cabinet.Data
 {
     public class UsersDBContext : DbContext
@@ -16,6 +17,7 @@ namespace projet_cabinet.Data
                 .HasValue<Patient>("Patient")
                 .HasValue<Infirmier>("Infirmier")
                 .HasValue<Medecin>("Medecin");
+
             modelBuilder.Entity<Patient>()
                 .HasOne(p => p.Dossier)
                 .WithOne(d => d.Patient)
@@ -33,10 +35,12 @@ namespace projet_cabinet.Data
                 .WithMany(p => p.RDVs)
                 .HasForeignKey(r => r.PatientID)
                 .OnDelete(DeleteBehavior.Cascade); 
+
             modelBuilder.Entity<Prescription>()
                 .HasOne(p => p.Dossier)
                 .WithMany(d => d.Prescriptions)
                 .HasForeignKey(p => p.DossierID);
+
             modelBuilder.Entity<Dossier>()
                 .HasOne(d => d.Medecin)
                 .WithMany(m => m.Dossiers)

@@ -26,10 +26,8 @@ namespace projet_cabinet.Controllers
         private string GenerateJwtToken(int expirationMinutes, string username, int id)
         {
             var keyBytes = Encoding.ASCII.GetBytes("tkrpgkretrkgreltrgertgtr");
-            string userType = context.Users
-            .Where(u => u.ID == id)
-            .Select(u => EF.Property<string>(u, "UserType"))
-            .FirstOrDefault();
+            string userType = context.Users.Where(u => u.ID == id).Select(u => EF.Property<string>(u, "UserType")).FirstOrDefault();
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
@@ -37,7 +35,8 @@ namespace projet_cabinet.Controllers
                 new Claim("Type", userType)
             };
 
-            var tokenOptions = new JwtSecurityToken(
+            var tokenOptions = new JwtSecurityToken
+            (
                 issuer: "pix",
                 audience: "pix",
                 claims: claims,
@@ -48,6 +47,7 @@ namespace projet_cabinet.Controllers
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             return tokenString;
         }
+
         // Dependency injection of your DbContext or user service here
         [AllowAnonymous]
         [HttpPost("register")]
@@ -67,9 +67,9 @@ namespace projet_cabinet.Controllers
             context.Users.Add(user);
             context.SaveChanges();
             // Add user to database and save changes
-
             return Ok(new { message = "Registration successful" });
         }
+
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin model)
@@ -84,6 +84,28 @@ namespace projet_cabinet.Controllers
             }
             var token = GenerateJwtToken(10, user.Email, user.ID);
             return Ok(new { message = "Login successful" , token = token});
+        }
+
+        [HttpGet("all")]
+        //[Authorize(Roles = "Admin")] 
+        public IActionResult GetAllUsers()
+        {
+            var users = context.Users.ToList();
+            return Ok(users);
+        }
+
+        [HttpGet("{id}")]
+        /*[Authorize] */
+        public IActionResult GetUserById(int id)
+        {
+            var user = context.Users.FirstOrDefault(u => u.ID == id);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            return Ok(user);
         }
     }
 }

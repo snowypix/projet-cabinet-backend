@@ -19,8 +19,8 @@ namespace projet_cabinet.Models
         public string Adresse { get; set; }
         [Required]
         public int Age { get; set; }
-
     }
+
     [Table("Users")]
     public class Patient : User
     {
@@ -28,7 +28,6 @@ namespace projet_cabinet.Models
         public string Antecedents { get; set; }
         public virtual Dossier? Dossier { get; set; }
         public virtual ICollection<RDV>? RDVs { get; set; }
-        // Properties specific to the Patient
     }
 
     [Table("Users")]
