@@ -16,7 +16,8 @@ namespace projet_cabinet.Data
                 .HasDiscriminator<string>("UserType")
                 .HasValue<Patient>("Patient")
                 .HasValue<Infirmier>("Infirmier")
-                .HasValue<Medecin>("Medecin");
+                .HasValue<Medecin>("Medecin")
+                .HasValue<Admin>("Admin");
 
             modelBuilder.Entity<Patient>()
                 .HasOne(p => p.Dossier)

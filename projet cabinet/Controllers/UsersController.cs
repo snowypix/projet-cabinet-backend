@@ -15,7 +15,7 @@ namespace projet_cabinet.Controllers
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase
-        
+
     {
         private readonly UsersDBContext context;
 
@@ -69,7 +69,47 @@ namespace projet_cabinet.Controllers
             // Add user to database and save changes
             return Ok(new { message = "Registration successful" });
         }
+        [AllowAnonymous]
+        [HttpPost("add")]
+        public IActionResult Add([FromBody] UserDto model)
+        {
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            User user = null;
 
+            switch (model.UserType)
+            {
+                case "Patient":
+                    user = new Patient
+                    {
+                        Antecedents = model.Antecedents
+                    };
+                    break;
+                case "Medecin":
+                    user = new Medecin
+                    {
+                        HoraireDebut = model.HoraireDebut,
+                        HoraireFin = model.HoraireFin
+                    };
+                    break;
+                default:
+                    break;
+            }
+
+            if (user != null)
+            {
+                user.Email = model.Email;
+                user.Password = hashedPassword;
+                user.FullName = model.FullName;
+                user.Age = model.Age;
+                user.Genre = model.Genre;
+                user.Adresse = model.Adresse;
+                context.Users.Add(user);
+                context.SaveChanges();
+            }
+
+            // Add user to database and save changes
+            return Ok(new { message = "Registration successful" });
+        }
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin model)
@@ -83,7 +123,7 @@ namespace projet_cabinet.Controllers
                 return BadRequest(new { message = "Invalid email or password" });
             }
             var token = GenerateJwtToken(10, user.Email, user.ID);
-            return Ok(new { message = "Login successful" , token = token});
+            return Ok(new { message = "Login successful", token = token });
         }
 
         [HttpGet("all")]

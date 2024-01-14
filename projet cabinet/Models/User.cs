@@ -35,7 +35,11 @@ namespace projet_cabinet.Models
     {
         // Properties specific to the Infirmier
     }
-
+    [Table("Users")]
+    public class Admin : User
+    {
+        // Properties specific to the Infirmier
+    }
     [Table("Users")]
     public class Medecin : User
     {
