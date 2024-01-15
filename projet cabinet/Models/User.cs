@@ -33,7 +33,8 @@ namespace projet_cabinet.Models
     [Table("Users")]
     public class Infirmier : User
     {
-        // Properties specific to the Infirmier
+        public TimeSpan? HoraireDebut { get; set; }
+        public TimeSpan? HoraireFin { get; set; }
     }
     [Table("Users")]
     public class Admin : User

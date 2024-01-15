@@ -69,6 +69,7 @@ namespace projet_cabinet.Controllers
             // Add user to database and save changes
             return Ok(new { message = "Registration successful" });
         }
+
         [AllowAnonymous]
         [HttpPost("add")]
         public IActionResult Add([FromBody] UserDto model)
@@ -91,8 +92,6 @@ namespace projet_cabinet.Controllers
                         HoraireFin = model.HoraireFin
                     };
                     break;
-                default:
-                    break;
             }
 
             if (user != null)
@@ -110,6 +109,7 @@ namespace projet_cabinet.Controllers
             // Add user to database and save changes
             return Ok(new { message = "Registration successful" });
         }
+
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin model)
@@ -128,7 +128,7 @@ namespace projet_cabinet.Controllers
 
         [HttpGet("all")]
         //[Authorize(Roles = "Admin")] 
-        public IActionResult GetAllUsers()
+        public IActionResult GetAllUsers1()
         {
             var users = context.Users.ToList();
             return Ok(users);
