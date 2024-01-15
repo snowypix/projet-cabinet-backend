@@ -133,6 +133,38 @@ namespace projet_cabinet.Controllers
             var users = context.Users.ToList();
             return Ok(users);
         }
+        [HttpGet("all2")]
+        //[Authorize(Roles = "Admin")] 
+        public IActionResult GetAllUsers2()
+        {
+            var users = context.Users.ToList();
+            var userDetails = users.Select(user =>
+            {
+                var userdto = new UserDto
+                {
+                    ID = user.ID,
+                    Email = user.Email,
+                    Password = user.Password,
+                    FullName = user.FullName,
+                    Genre = user.Genre,
+                    Adresse = user.Adresse,
+                    Age = user.Age
+                };
+
+                if (user is Patient patient)
+                {
+                    userdto.Antecedents = patient.Antecedents;
+                }
+                if (user is Medecin medecin)
+                {
+                    userdto.HoraireDebut = medecin.HoraireDebut;
+                    userdto.HoraireFin = medecin.HoraireFin;
+                }
+                return userdto;
+            }).ToList();
+
+            return Ok(userDetails);
+        }
 
         [HttpGet("{id}")]
         /*[Authorize] */
