@@ -75,39 +75,167 @@ namespace projet_cabinet.Controllers
         public IActionResult Add([FromBody] UserDto model)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
-            User user = null;
-
             switch (model.UserType)
             {
                 case "Patient":
-                    user = new Patient
+                    var user = new Patient
                     {
-                        Antecedents = model.Antecedents
+                        Antecedents = model.Antecedents,
+                        Email = model.Email,
+                        Password = hashedPassword,
+                        FullName = model.FullName,
+                        Age = model.Age,
+                        Genre = model.Genre,
+                        Adresse = model.Adresse,
                     };
+                    context.Users.Add(user);
                     break;
                 case "Medecin":
-                    user = new Medecin
+                    var user1 = new Medecin
                     {
+                        Email = model.Email,
+                        Password = hashedPassword,
+                        FullName = model.FullName,
+                        Age = model.Age,
+                        Genre = model.Genre,
+                        Adresse = model.Adresse,
                         HoraireDebut = model.HoraireDebut,
                         HoraireFin = model.HoraireFin
                     };
+                    context.Users.Add(user1);
+                    break;
+                case "Infirmier":
+                    var user2 = new Infirmier
+                    {
+                        Email = model.Email,
+                        FullName = model.FullName,
+                        Age = model.Age,
+                        Password = hashedPassword,
+                        Genre = model.Genre,
+                        Adresse = model.Adresse,
+                        HoraireDebut = model.HoraireDebut,
+                        HoraireFin = model.HoraireFin
+                    };
+                    context.Users.Add(user2);
+                    break;
+                default:
+                    var user3 = new Admin
+                    {
+                        Email = model.Email,
+                        FullName = model.FullName,
+                        Password = hashedPassword,
+                        Age = model.Age,
+                        Genre = model.Genre,
+                        Adresse = model.Adresse
+                    };
+                    context.Users.Add(user3);
                     break;
             }
 
-            if (user != null)
-            {
-                user.Email = model.Email;
-                user.Password = hashedPassword;
-                user.FullName = model.FullName;
-                user.Age = model.Age;
-                user.Genre = model.Genre;
-                user.Adresse = model.Adresse;
-                context.Users.Add(user);
-                context.SaveChanges();
-            }
+
+            context.SaveChanges();
+
 
             // Add user to database and save changes
             return Ok(new { message = "Registration successful" });
+        }
+        [AllowAnonymous]
+        [HttpPost("modify/{id}")]
+        public IActionResult Modify(int id, [FromBody] UserDto model)
+        {
+            // You would need to fetch the user from the database first
+            User user = context.Users.Find(id);
+
+            // Handle the case where the user might not be found
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+
+            if (model.UserType == "Patient")
+            {
+                var patient = new Patient
+                {
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    Age = model.Age,
+                    Password = model.Password,
+                    Genre = model.Genre,
+                    Adresse = model.Adresse,
+                    Antecedents = model.Antecedents
+                };
+                context.Users.Add(patient);
+                // Rest of your code with the patient object
+            }
+            if (model.UserType == "Medecin")
+            {
+                var patient = new Medecin
+                {
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    Age = model.Age,
+                    Password = model.Password,
+                    Genre = model.Genre,
+                    Adresse = model.Adresse,
+                    HoraireDebut = model.HoraireDebut,
+                    HoraireFin = model.HoraireFin
+                };
+                context.Users.Add(patient);
+                // Rest of your code with the patient object
+            }
+            if (model.UserType == "Infirmier")
+            {
+                var patient = new Infirmier
+                {
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    Age = model.Age,
+                    Password = model.Password,
+                    Genre = model.Genre,
+                    Adresse = model.Adresse,
+                    HoraireDebut = model.HoraireDebut,
+                    HoraireFin = model.HoraireFin
+                };
+                context.Users.Add(patient);
+                // Rest of your code with the patient object
+            }
+            if (model.UserType == "Admin")
+            {
+                var patient = new Admin
+                {
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    Age = model.Age,
+                    Password = model.Password,
+                    Genre = model.Genre,
+                    Adresse = model.Adresse
+                };
+                context.Users.Add(patient);
+                // Rest of your code with the patient object
+            }
+            // Handle different user types if necessary
+            context.Users.Remove(user);
+
+            // Save the changes to the database
+            context.SaveChanges();
+
+            return Ok(new { message = "User modified successfully" });
+        }
+        [AllowAnonymous]
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(int id)
+        {
+            var user = context.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            context.Users.Remove(user);
+            context.SaveChanges();
+
+            return Ok(new { message = "User deleted successfully" });
         }
 
         [AllowAnonymous]
@@ -159,6 +287,11 @@ namespace projet_cabinet.Controllers
                 {
                     userdto.HoraireDebut = medecin.HoraireDebut;
                     userdto.HoraireFin = medecin.HoraireFin;
+                }
+                if (user is Infirmier infirmier)
+                {
+                    userdto.HoraireDebut = infirmier.HoraireDebut;
+                    userdto.HoraireFin = infirmier.HoraireFin;
                 }
                 return userdto;
             }).ToList();
