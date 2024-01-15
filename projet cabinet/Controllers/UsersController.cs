@@ -133,6 +133,7 @@ namespace projet_cabinet.Controllers
             var users = context.Users.ToList();
             return Ok(users);
         }
+
         [HttpGet("all2")]
         //[Authorize(Roles = "Admin")] 
         public IActionResult GetAllUsers2()
